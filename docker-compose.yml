@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: heritage_archive_db
+    restart: always
+    environment:
+      POSTGRES_DB: heritage_archive
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: wYPQRtlWuM5rUeGz
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d heritage_archive"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
