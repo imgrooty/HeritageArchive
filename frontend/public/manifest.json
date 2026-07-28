@@ -1,0 +1,16 @@
+{
+  "name": "Local Cultural Heritage Archive",
+  "short_name": "HeritageArchive",
+  "description": "Digital archive for preserving and discovering local cultural heritage sites.",
+  "start_url": "/discover",
+  "display": "standalone",
+  "background_color": "#07070a",
+  "theme_color": "#f59e0b",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

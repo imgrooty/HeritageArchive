@@ -1,0 +1,23 @@
+# Core API Framework
+fastapi
+uvicorn[standard]
+
+# Configuration & Validation
+pydantic
+pydantic-settings
+
+# Database & Async Drivers
+sqlalchemy
+asyncpg
+
+# Authentication & Cryptography
+python-jose[cryptography]
+bcrypt
+
+# Form/Multipart File Processing
+python-multipart
+
+# Email Validation & HTTP Utilities
+email-validator
+httpx
+
