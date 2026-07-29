@@ -24,3 +24,26 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 
   return response.json();
 }
+
+export const apiFetch = fetchAPI;
+
+type LoginResponse = {
+  access_token: string;
+  token_type: string;
+};
+
+export async function loginUser(username: string, password: string): Promise<LoginResponse> {
+  const data = (await fetchAPI("/auth/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({ username, password }).toString(),
+  })) as LoginResponse;
+
+  if (typeof window !== "undefined" && data?.access_token) {
+    localStorage.setItem("token", data.access_token);
+  }
+
+  return data;
+}
