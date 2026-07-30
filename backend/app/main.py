@@ -38,7 +38,9 @@ async def init_db():
                     print(f"Notice: pgvector extension not initialized. Vector search will soft-fallback. Detail: {e}")
         print("Database schema and tables verified/created successfully.")
     except Exception as e:
-        print(f"Warning: Database initialization check encountered an issue: {e}")
+        import traceback
+        print(f"Warning: Database initialization check encountered an issue: {type(e).__name__}: {e}")
+        traceback.print_exc()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

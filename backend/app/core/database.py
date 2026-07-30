@@ -11,6 +11,9 @@ db_url = settings.DATABASE_URL
 if os.environ.get("VERCEL") and ("localhost" in db_url or "127.0.0.1" in db_url):
     db_url = "sqlite+aiosqlite:////tmp/heritage.db"
 
+masked = db_url.split("@")[-1] if "@" in db_url else db_url
+print(f"Initializing database engine target: {masked}")
+
 # Normalize postgres URL scheme for SQLAlchemy asyncpg driver
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql+asyncpg://", 1)
