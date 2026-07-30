@@ -14,11 +14,11 @@ class Settings(BaseSettings):
     )
 
     # Database Configuration
-    DATABASE_URL: str
-    SYNC_DATABASE_URL: str
+    DATABASE_URL: str = "sqlite+aiosqlite:////tmp/heritage.db"
+    SYNC_DATABASE_URL: str = "sqlite:////tmp/heritage.db"
 
     # Security & Authentication
-    SECRET_KEY: str
+    SECRET_KEY: str = "default_secret_key_change_in_production_987654321"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     # Server Configuration
