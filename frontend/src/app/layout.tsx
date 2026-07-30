@@ -1,28 +1,35 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Rozha_One, Noto_Serif_Devanagari } from "next/font/google";
+import { Plus_Jakarta_Sans, Cormorant_Garamond, Mukta, Martel } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 
 const jakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-jakarta-sans",
+  variable: "--font-jakarta",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
 });
 
-const rozhaOne = Rozha_One({
-  variable: "--font-rozha-one",
-  subsets: ["latin", "devanagari"],
-  weight: ["400"],
+const cormorantGaramond = Cormorant_Garamond({
+  variable: "--font-garamond",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
 });
 
-const notoDevanagari = Noto_Serif_Devanagari({
-  variable: "--font-noto-devanagari",
-  subsets: ["devanagari"],
-  weight: ["400", "600", "700", "800"],
+const mukta = Mukta({
+  variable: "--font-mukta",
+  subsets: ["devanagari", "latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+});
+
+const martel = Martel({
+  variable: "--font-martel",
+  subsets: ["devanagari", "latin"],
+  weight: ["300", "400", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: "Cultural Heritage Archive — Preserving Local Traditions & Stories",
+  title: "Cultural Heritage Archive — Digital Preservation Network",
   description: "A community-driven digital archive dedicated to documenting, translating, and mapping local cultural heritage, historical sites, and traditional practices.",
   manifest: "/manifest.json",
 };
@@ -35,7 +42,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${jakartaSans.variable} ${rozhaOne.variable} ${notoDevanagari.variable} h-full w-full max-w-full overflow-x-hidden antialiased bg-[#07070a]`}
+      className={`${jakartaSans.variable} ${cormorantGaramond.variable} ${mukta.variable} ${martel.variable} antialiased bg-[#09090b]`}
     >
       <head>
         <link
@@ -45,7 +52,7 @@ export default function RootLayout({
           crossOrigin=""
         />
       </head>
-      <body className="min-h-screen flex flex-col w-full max-w-full overflow-x-hidden bg-[#07070a] text-[#f4f4f7] font-sans">
+      <body className="min-h-screen flex flex-col w-full bg-[#09090b] text-[#f4f4f7] font-sans selection:bg-[#c5a059] selection:text-black">
         <SmoothScroll>
           {children}
         </SmoothScroll>

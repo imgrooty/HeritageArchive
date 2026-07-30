@@ -3,26 +3,26 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import LanguageSelector from "@/components/LanguageSelector";
+import InteractiveTiltCard from "@/components/InteractiveTiltCard";
+import ScrollReveal from "@/components/ScrollReveal";
+import CustomCursor from "@/components/CustomCursor";
 
 interface QuizQuestion {
   id: number;
   question: string;
   options: string[];
-  answer: number; // Index of correct option
+  answer: number;
   explanation: string;
 }
 
 export default function EducationPortal() {
   const router = useRouter();
 
-  // Quiz State
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isChecked, setIsChecked] = useState(false);
   const [score, setScore] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
-
-  // Glossary Search state
   const [glossarySearch, setGlossarySearch] = useState("");
 
   const quizQuestions: QuizQuestion[] = [
@@ -100,51 +100,47 @@ export default function EducationPortal() {
       definition: "The intricate woodworking craft developed by the Newar community of Kathmandu Valley. Characterized by detailed lattice work, mythological carvings on struts, and decorated doors/windows seen in Durbar Squares."
     },
     {
-      term: "Biska Jatra",
-      category: "Festival 🌊",
-      definition: "A multi-day chariot pulling festival in Bhaktapur marking the Bikram Sambat solar New Year. The festival culminates in erecting a massive wooden pole (Lyo Dhyo) representing victory over evil."
+      term: "Paubha Scroll Painting",
+      category: "Fine Art 📜",
+      definition: "A traditional religious painting made by Newar artists in Nepal depicting deities, mandalas, or monuments. Painted on cloth using natural mineral colors and pure gold."
     },
     {
-      term: "Bibaha Panchami",
-      category: "Festival 🌊",
-      definition: "A grand festival celebrated in Janakpur commemorating the mythological wedding of Lord Rama and Goddess Sita. Thousands of pilgrims visit the Janaki Temple to watch the wedding reenactment."
+      term: "Charya Nritya (Sacred Dance)",
+      category: "Performing Arts 💃",
+      definition: "An ancient Vajrayana Buddhist dance tradition practiced in Kathmandu Valley. Dancers wear deity masks and silver jewelry while performing ritual hand mudras."
     },
     {
-      term: "Oral Narratives (Gathu)",
-      category: "Tradition 🗣️",
-      definition: "Oral storytelling traditions and song rituals kept alive by village elders. Used to pass down historical events, spiritual beliefs, and lineage records through generations without formal written scripts."
-    },
-    {
-      term: "Ganga Sagar",
-      category: "Natural 🌳",
-      definition: "A sacred lake located in Janakpur. Mentioned in ancient scriptures, it is a key site for religious ablutions, evening Ganga Aarti rituals, and community gatherings during Chhath Puja."
+      term: "Torana Archways",
+      category: "Architectural Shrine ⛩️",
+      definition: "Intricately sculpted semicircular wooden or metal tympanums placed over shrine doorways, depicting Garuda, Chepu, Nagas, and deity figures."
     }
   ];
 
   const handleOptionSelect = (index: number) => {
-    if (isChecked) return;
-    setSelectedOption(index);
+    if (!isChecked) {
+      setSelectedOption(index);
+    }
   };
 
   const handleCheckAnswer = () => {
-    if (selectedOption === null || isChecked) return;
+    if (selectedOption === null) return;
     setIsChecked(true);
     if (selectedOption === quizQuestions[currentQuestion].answer) {
-      setScore((prev) => prev + 1);
+      setScore(score + 1);
     }
   };
 
   const handleNextQuestion = () => {
-    setSelectedOption(null);
-    setIsChecked(false);
     if (currentQuestion < quizQuestions.length - 1) {
-      setCurrentQuestion((prev) => prev + 1);
+      setCurrentQuestion(currentQuestion + 1);
+      setSelectedOption(null);
+      setIsChecked(false);
     } else {
       setQuizFinished(true);
     }
   };
 
-  const handleRestartQuiz = () => {
+  const resetQuiz = () => {
     setCurrentQuestion(0);
     setSelectedOption(null);
     setIsChecked(false);
@@ -152,226 +148,214 @@ export default function EducationPortal() {
     setQuizFinished(false);
   };
 
-  const getRank = () => {
-    if (score === 5) return { title: "Preservation Scholar 🎓", class: "text-amber-400 bg-amber-500/10 border-amber-500/25" };
-    if (score >= 3) return { title: "Cultural Explorer 🗺️", class: "text-sky-400 bg-sky-500/10 border-sky-500/25" };
-    return { title: "Heritage Novice 📜", class: "text-zinc-400 bg-zinc-500/10 border-zinc-500/20" };
-  };
-
   const filteredGlossary = glossaryItems.filter(
     (item) =>
       item.term.toLowerCase().includes(glossarySearch.toLowerCase()) ||
-      item.definition.toLowerCase().includes(glossarySearch.toLowerCase())
+      item.definition.toLowerCase().includes(glossarySearch.toLowerCase()) ||
+      item.category.toLowerCase().includes(glossarySearch.toLowerCase())
   );
 
   return (
-    <div className="min-h-screen bg-[#07070a] text-white flex flex-col selection:bg-[#fb923c] selection:text-black">
-      {/* Navigation Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-[#07070a]/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push("/")}>
-            <span className="text-xl">🛕</span>
-            <span className="font-black text-sm tracking-widest bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent uppercase">
-              HERITAGE ARCHIVE
-            </span>
+    <div className="min-h-screen bg-[#09090b] text-[#f4f4f7] archive-grid-bg flex flex-col relative overflow-x-hidden">
+      
+      <CustomCursor />
+
+      {/* Institutional Header */}
+      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#09090b]/90 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => router.push("/")}>
+            <div className="w-9 h-9 rounded-full bg-[#c5a059] flex items-center justify-center font-bold text-black text-sm font-devanagari">
+              ने
+            </div>
+            <div className="flex flex-col">
+              <span className="font-display font-medium text-lg tracking-tight text-white uppercase">
+                RESEARCH <span className="text-[#c5a059]">PORTAL</span>
+              </span>
+              <span className="text-[10px] text-zinc-400 font-devanagari tracking-wider -mt-1">
+                सांस्कृतिक तथा शैक्षिक स्रोत
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-6">
-            <nav className="hidden sm:flex items-center gap-6 text-xs font-bold text-zinc-400 uppercase tracking-wider">
-              <button onClick={() => router.push("/discover")} className="hover:text-white transition-colors">
-                Discover Map
-              </button>
-              <button onClick={() => router.push("/education")} className="text-white">
-                Education Portal
-              </button>
-              <button onClick={() => router.push("/contribute")} className="hover:text-white transition-colors">
-                Contribute
-              </button>
-            </nav>
+          <div className="hidden md:flex items-center gap-8 text-xs font-mono tracking-widest text-zinc-300 uppercase">
+            <a href="/" className="hover:text-[#c5a059] transition-colors">Index</a>
+            <a href="/discover" className="hover:text-[#c5a059] transition-colors">Catalogue</a>
+            <span className="text-[#c5a059]">Research</span>
+            <a href="/contribute" className="hover:text-[#c5a059] transition-colors">Contribute</a>
+          </div>
+
+          <div className="flex items-center gap-4">
             <LanguageSelector />
-            <a
-              href="/auth/login"
-              className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 text-xs font-bold text-black shadow-lg hover:shadow-orange-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            <button
+              onClick={() => router.push("/discover")}
+              className="px-4 py-2 bg-[#c5a059] hover:bg-[#d4af37] text-black font-mono font-semibold text-xs uppercase tracking-wider rounded-lg transition-all"
             >
-              Sign In
-            </a>
+              Explore Map
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Main Content Layout */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-12 gap-10">
+      {/* Main Educational Content */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10 space-y-12 z-20 relative">
         
-        {/* Left Column - Heritage Quiz */}
-        <div className="lg:col-span-7 flex flex-col gap-6">
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] text-amber-500 font-extrabold uppercase tracking-wider">Interactive Learning</span>
-            <h2 className="text-3xl font-black">Heritage Knowledge Quiz</h2>
-            <p className="text-xs text-zinc-400 leading-relaxed max-w-xl">
-              Test your understanding of Nepalese local heritage sites, oral traditions, and community verification protocols.
+        {/* Banner Section */}
+        <ScrollReveal direction="up">
+          <div className="bg-[#121216] border border-white/10 rounded-2xl p-8 space-y-4">
+            <span className="text-[11px] font-mono tracking-widest text-[#c5a059] uppercase font-semibold">
+              EDUCATIONAL KNOWLEDGE HUB • DEPT OF HERITAGE RESEARCH
+            </span>
+            <h1 className="text-3xl md:text-5xl font-normal text-white font-display">
+              Heritage Knowledge &amp; Educational Resources
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-400 max-w-3xl leading-relaxed">
+              Explore curated academic entries on traditional Nepalese architecture, indigenous fine arts, intangible performing traditions, and historical site literature.
             </p>
           </div>
+        </ScrollReveal>
 
-          <div className="p-6 rounded-3xl border border-white/5 bg-[#0a0a0e] shadow-xl flex flex-col gap-6">
+        {/* Section 1: Cultural Glossary */}
+        <ScrollReveal direction="up">
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+              <div>
+                <span className="text-[11px] font-mono text-[#c5a059] uppercase tracking-wider font-semibold">
+                  ARCHIVAL GLOSSARY &amp; CONTEXT INDEX
+                </span>
+                <h2 className="text-2xl font-normal text-white font-display mt-0.5">
+                  Cultural Terminology Dictionary
+                </h2>
+              </div>
+
+              {/* Glossary Search Input */}
+              <div className="w-full sm:w-80 flex items-center gap-2 px-3.5 py-2 bg-[#09090b] border border-white/10 focus-within:border-[#c5a059] transition-all rounded-xl">
+                <span className="text-zinc-500 font-mono text-xs">🔍</span>
+                <input
+                  type="text"
+                  placeholder="Search glossary terms..."
+                  value={glossarySearch}
+                  onChange={(e) => setGlossarySearch(e.target.value)}
+                  className="w-full bg-transparent border-none outline-none text-xs text-white placeholder-zinc-500 font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredGlossary.map((item, idx) => (
+                <InteractiveTiltCard key={idx} badgeNumber={`GLOSS-${idx + 1}`} className="archive-card p-6 rounded-2xl flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <span className="text-[10px] text-[#c5a059] font-mono uppercase tracking-wider">
+                      {item.category}
+                    </span>
+                    <h3 className="text-lg font-medium text-white font-display">
+                      {item.term}
+                    </h3>
+                    <p className="text-xs text-zinc-400 leading-relaxed font-body">
+                      {item.definition}
+                    </p>
+                  </div>
+                </InteractiveTiltCard>
+              ))}
+            </div>
+          </div>
+        </ScrollReveal>
+
+        {/* Section 2: Heritage Assessment Quiz */}
+        <ScrollReveal direction="up">
+          <div className="bg-[#121216] border border-white/10 rounded-2xl p-6 md:p-8 space-y-6">
+            <div className="border-b border-white/10 pb-4">
+              <span className="text-[11px] font-mono text-[#c5a059] uppercase tracking-wider font-semibold">
+                KNOWLEDGE EVALUATION • QUIZ MODULE
+              </span>
+              <h2 className="text-2xl font-normal text-white font-display mt-0.5">
+                Heritage Verification Assessment
+              </h2>
+            </div>
+
             {!quizFinished ? (
-              <>
-                {/* Quiz Header Info */}
-                <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-                    Question {currentQuestion + 1} of {quizQuestions.length}
-                  </span>
-                  <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                    Score: {score}
-                  </span>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
+                  <span>Question {currentQuestion + 1} of {quizQuestions.length}</span>
+                  <span className="text-[#c5a059]">Score: {score}</span>
                 </div>
 
-                {/* Question */}
-                <h3 className="text-base font-extrabold text-white leading-relaxed">
+                <h3 className="text-lg font-medium text-white font-display">
                   {quizQuestions[currentQuestion].question}
                 </h3>
 
-                {/* Options List */}
-                <div className="flex flex-col gap-3">
-                  {quizQuestions[currentQuestion].options.map((opt, idx) => {
-                    const isSelected = selectedOption === idx;
-                    const isCorrect = idx === quizQuestions[currentQuestion].answer;
-                    
-                    let btnStyle = "border-white/5 bg-white/[0.02] text-zinc-300 hover:border-white/10 hover:bg-white/[0.04]";
-                    if (isSelected) {
-                      btnStyle = "border-amber-500/40 bg-amber-500/5 text-amber-400";
+                <div className="space-y-3">
+                  {quizQuestions[currentQuestion].options.map((option, idx) => {
+                    let btnClass = "bg-[#09090b] border-white/10 text-zinc-300 hover:border-white/20";
+                    if (selectedOption === idx) {
+                      btnClass = "bg-[#c5a059]/10 border-[#c5a059] text-white";
                     }
                     if (isChecked) {
-                      if (isCorrect) {
-                        btnStyle = "border-emerald-500/40 bg-emerald-500/5 text-emerald-400";
-                      } else if (isSelected) {
-                        btnStyle = "border-rose-500/40 bg-rose-500/5 text-rose-400";
-                      } else {
-                        btnStyle = "opacity-40 border-white/5 bg-white/[0.01] text-zinc-500";
+                      if (idx === quizQuestions[currentQuestion].answer) {
+                        btnClass = "bg-emerald-950/60 border-emerald-500 text-emerald-300";
+                      } else if (selectedOption === idx) {
+                        btnClass = "bg-red-950/60 border-red-500 text-red-300";
                       }
                     }
 
                     return (
-                      <button
+                      <div
                         key={idx}
                         onClick={() => handleOptionSelect(idx)}
-                        disabled={isChecked}
-                        className={`w-full text-left p-4 rounded-xl border text-xs font-semibold leading-relaxed transition-all flex items-center justify-between gap-4 ${btnStyle}`}
+                        className={`p-4 rounded-xl border text-xs font-mono transition-all cursor-pointer flex items-center justify-between ${btnClass}`}
                       >
-                        <span>{opt}</span>
-                        {isChecked && isCorrect && <span className="text-emerald-400 text-sm">✓</span>}
-                        {isChecked && isSelected && !isCorrect && <span className="text-rose-400 text-sm">✗</span>}
-                      </button>
+                        <span>{option}</span>
+                        {isChecked && idx === quizQuestions[currentQuestion].answer && <span>✓ Correct</span>}
+                      </div>
                     );
                   })}
                 </div>
 
-                {/* Explanation Card */}
                 {isChecked && (
-                  <div className="p-4 rounded-2xl border border-white/5 bg-[#0b0b0f] text-[11px] leading-relaxed text-zinc-400 animate-fade-in flex flex-col gap-1">
-                    <span className="font-extrabold text-white uppercase tracking-wider text-[9px] text-amber-500">
-                      💡 Knowledge Detail
-                    </span>
+                  <div className="p-4 rounded-xl bg-[#09090b] border border-white/10 text-xs text-zinc-300 space-y-1 font-body">
+                    <span className="font-mono text-[#c5a059] uppercase text-[10px]">Explanation:</span>
                     <p>{quizQuestions[currentQuestion].explanation}</p>
                   </div>
                 )}
 
-                {/* Footer Controls */}
-                <div className="flex justify-end gap-3 mt-2">
+                <div className="flex items-center justify-between pt-4 border-t border-white/10">
                   {!isChecked ? (
                     <button
                       onClick={handleCheckAnswer}
                       disabled={selectedOption === null}
-                      className="px-6 py-2.5 rounded-xl bg-amber-500 text-black font-bold text-xs hover:scale-95 disabled:opacity-40 disabled:pointer-events-none transition-all"
+                      className="px-5 py-2.5 bg-[#c5a059] disabled:opacity-40 hover:bg-[#d4af37] text-black font-mono font-semibold text-xs uppercase tracking-wider rounded-lg transition-all"
                     >
-                      Check Answer
+                      Submit Answer
                     </button>
                   ) : (
                     <button
                       onClick={handleNextQuestion}
-                      className="px-6 py-2.5 rounded-xl bg-amber-500 text-black font-bold text-xs hover:scale-95 transition-all"
+                      className="px-5 py-2.5 bg-[#c5a059] hover:bg-[#d4af37] text-black font-mono font-semibold text-xs uppercase tracking-wider rounded-lg transition-all"
                     >
-                      {currentQuestion === quizQuestions.length - 1 ? "Finish Quiz" : "Next Question →"}
+                      {currentQuestion < quizQuestions.length - 1 ? "Next Question →" : "Finish Quiz"}
                     </button>
                   )}
                 </div>
-              </>
+              </div>
             ) : (
-              // Quiz Finished Screen
-              <div className="py-8 flex flex-col items-center justify-center text-center gap-5">
-                <span className="text-4xl animate-bounce">🏆</span>
-                <div className="flex flex-col gap-1">
-                  <h3 className="text-xl font-black text-white">Quiz Completed!</h3>
-                  <p className="text-xs text-zinc-500">You scored {score} out of {quizQuestions.length} correct answers.</p>
-                </div>
-
-                {/* Performance Title Badge */}
-                <div className={`px-4 py-2 rounded-2xl border text-xs font-black uppercase tracking-widest ${getRank().class}`}>
-                  {getRank().title}
-                </div>
-
-                <p className="text-xs text-zinc-400 max-w-sm leading-relaxed">
-                  {score === 5 
-                    ? "Exceptional! You possess outstanding understanding of the archive's cultural assets."
-                    : "Great job! Explore the glossary on the right to deepen your cultural preservation knowledge."}
+              <div className="text-center py-10 space-y-4">
+                <span className="text-4xl">🎓</span>
+                <h3 className="text-2xl font-normal text-white font-display">Assessment Complete!</h3>
+                <p className="text-sm text-zinc-400 font-mono">
+                  Final Score: <span className="text-[#c5a059] font-bold">{score} / {quizQuestions.length}</span>
                 </p>
-
                 <button
-                  onClick={handleRestartQuiz}
-                  className="px-6 py-3 rounded-xl bg-amber-500 text-black font-bold text-xs hover:scale-95 transition-all mt-2"
+                  onClick={resetQuiz}
+                  className="px-6 py-2.5 bg-[#c5a059] hover:bg-[#d4af37] text-black font-mono font-semibold text-xs uppercase tracking-wider rounded-lg transition-all"
                 >
-                  Restart Quiz
+                  Retake Evaluation
                 </button>
               </div>
             )}
           </div>
-        </div>
+        </ScrollReveal>
 
-        {/* Right Column - Cultural Glossary */}
-        <div className="lg:col-span-5 flex flex-col gap-6">
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] text-zinc-500 font-extrabold uppercase tracking-wider">Glossary Database</span>
-            <h2 className="text-2xl font-black">Cultural Terms</h2>
-            
-            {/* Filter Search Input */}
-            <div className="w-full flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 focus-within:border-amber-500/50 transition-all mt-2">
-              <svg className="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                id="glossary-search-input"
-                name="glossarySearch"
-                type="text"
-                placeholder="Search cultural terms or descriptions..."
-                value={glossarySearch}
-                onChange={(e) => setGlossarySearch(e.target.value)}
-                className="w-full bg-transparent border-none outline-none text-xs text-white placeholder-zinc-500"
-              />
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-y-auto max-h-[550px] pr-1 flex flex-col gap-4 scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent">
-            {filteredGlossary.length === 0 ? (
-              <div className="text-center py-20 text-zinc-500 border border-dashed border-white/5 rounded-2xl">
-                <p className="text-xs font-semibold">No glossary terms found matching query.</p>
-              </div>
-            ) : (
-              filteredGlossary.map((item, idx) => (
-                <div key={idx} className="p-4 rounded-2xl border border-white/5 bg-[#0a0a0e]/50 hover:bg-[#0f0f15]/75 hover:border-white/10 transition-all flex flex-col gap-2">
-                  <div className="flex justify-between items-start gap-3">
-                    <h4 className="text-xs font-extrabold text-white">{item.term}</h4>
-                    <span className="text-[9px] font-black text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded uppercase tracking-wider">
-                      {item.category}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-zinc-400 leading-relaxed">
-                    {item.definition}
-                  </p>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
       </main>
+
     </div>
   );
 }

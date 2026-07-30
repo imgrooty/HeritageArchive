@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #07070a;
+  --background: #09090b;
   --foreground: #f4f4f7;
-  --font-sans: var(--font-jakarta-sans), system-ui, sans-serif;
-  --font-serif: var(--font-rozha-one), serif;
-  --font-devanagari: var(--font-noto-devanagari), serif;
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+  --font-serif: var(--font-garamond), Georgia, serif;
+  --font-devanagari: var(--font-mukta), var(--font-martel), sans-serif;
 }
 
 *, ::before, ::after {
@@ -13,10 +13,9 @@
 }
 
 html {
-  background-color: #07070a;
+  background-color: #09090b;
   color: #f4f4f7;
   font-family: var(--font-sans);
-  scroll-behavior: initial !important;
 }
 
 html.lenis, html.lenis body {
@@ -43,75 +42,96 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
-  max-width: 100vw;
-  overflow-x: hidden;
-  background-color: #07070a;
+  background-color: #09090b;
   color: #f4f4f7;
 }
 
-/* Stylish Typography Classes */
+/* Minimalist Typography System */
+.font-display {
+  font-family: var(--font-garamond), Georgia, serif;
+  letter-spacing: -0.02em;
+}
+
+.font-body {
+  font-family: var(--font-jakarta), system-ui, sans-serif;
+}
+
 .font-devanagari {
-  font-family: var(--font-devanagari), 'Rozha One', serif;
+  font-family: var(--font-mukta), var(--font-martel), sans-serif;
 }
 
-.font-serif-accent {
-  font-family: var(--font-serif), Georgia, serif;
+.font-devanagari-serif {
+  font-family: var(--font-martel), serif;
 }
 
-/* Modern Glassmorphic Utilities */
-.glass-panel {
-  background: rgba(14, 14, 20, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+/* Archival Fine Grid Background */
+.archive-grid-bg {
+  background-color: #09090b;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(197, 160, 89, 0.05) 0%, transparent 70%),
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 60px 60px, 60px 60px;
 }
 
-.glass-card {
-  background: rgba(18, 18, 26, 0.55);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+/* Fine Hairline Border Utilities */
+.border-archive {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.border-gold {
+  border-color: rgba(197, 160, 89, 0.3);
+}
+
+/* Sleek Institutional Card */
+.archive-card {
+  background: #121216;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.glass-card:hover {
-  border-color: rgba(245, 158, 11, 0.35);
-  box-shadow: 0 12px 30px -10px rgba(245, 158, 11, 0.12);
-  transform: translateY(-4px);
+.archive-card:hover {
+  border-color: rgba(197, 160, 89, 0.4);
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.8), 0 0 20px -5px rgba(197, 160, 89, 0.15);
+  transform: translateY(-2px);
 }
 
-/* Text Gradient Accents */
-.text-gradient-amber {
-  background: linear-gradient(135deg, #fde68a 0%, #f59e0b 50%, #ea580c 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Text Accent Colors */
+.text-gold {
+  color: #c5a059;
 }
 
-.text-gradient-gold {
-  background: linear-gradient(135deg, #fff 0%, #fcd34d 50%, #f59e0b 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+.text-gold-light {
+  color: #e5c178;
 }
 
-/* Glowing Border Pulse */
-.glow-amber {
-  box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.25);
+.bg-gold {
+  background-color: #c5a059;
 }
 
-/* Scrollbar Customization */
+/* Leaflet Dark Popup Styles */
+.leaflet-popup-content-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-tip {
+  background: #121216 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Custom Minimal Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #07070a;
+  background: #09090b;
 }
 ::-webkit-scrollbar-thumb {
-  background: #272730;
+  background: #3f3f46;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #f59e0b;
+  background: #c5a059;
 }
-

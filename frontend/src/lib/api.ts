@@ -106,3 +106,28 @@ export async function uploadMedia(siteId: number, file: File) {
   }
   return res.json();
 }
+
+export async function deleteMedia(siteId: number, mediaId: number) {
+  const headers: Record<string, string> = {};
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+  }
+
+  const res = await fetch(`${API_BASE_URL}/heritage/${siteId}/media/${mediaId}`, {
+    method: "DELETE",
+    headers,
+  });
+
+  if (!res.ok) {
+    let errorDetail = "Delete media failed";
+    try {
+      const data = await res.json();
+      errorDetail = data.detail || errorDetail;
+    } catch {}
+    throw new Error(errorDetail);
+  }
+  return res.json();
+}

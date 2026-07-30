@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import InteractiveTiltCard from "@/components/InteractiveTiltCard";
+import ScrollReveal from "@/components/ScrollReveal";
+import CustomCursor from "@/components/CustomCursor";
 
 interface Story {
   id: number;
@@ -46,13 +49,11 @@ export default function ModerationPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Selection & Action states
   const [selectedSite, setSelectedSite] = useState<HeritageSite | null>(null);
   const [notes, setNotes] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  // Load user session & verify roles
   useEffect(() => {
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("token");
@@ -64,7 +65,7 @@ export default function ModerationPage() {
       if (decoded && (decoded.role === "moderator" || decoded.role === "admin")) {
         setUser({ username: decoded.username, role: decoded.role });
       } else {
-        router.push("/discover"); // Send unauthorized users back to Discover
+        router.push("/discover");
       }
     }
   }, []);
@@ -98,195 +99,188 @@ export default function ModerationPage() {
     setActionLoading(true);
     setActionError(null);
     try {
-      const payload = {
-        status,
-        notes: notes.trim() !== "" ? notes : null,
-      };
-      await apiFetch(`/moderation/${selectedSite.id}/action`, {
+      await apiFetch(`/moderation/${selectedSite.id}/review`, {
         method: "POST",
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          status,
+          notes,
+        }),
       });
+
       setNotes("");
-      await fetchQueue(); // Refresh queue
+      fetchQueue();
     } catch (err: any) {
-      setActionError(err.message || "Failed to submit moderation action.");
+      setActionError(err.message || "Failed to process review action.");
     } finally {
       setActionLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#07070a] text-white flex flex-col selection:bg-[#fb923c] selection:text-black">
-      {/* Navigation Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-[#07070a]/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push("/")}>
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center font-extrabold text-black text-base shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+    <div className="min-h-screen bg-[#09090b] text-[#f4f4f7] archive-grid-bg flex flex-col relative overflow-x-hidden">
+      
+      <CustomCursor />
+
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#09090b]/90 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => router.push("/")}>
+            <div className="w-9 h-9 rounded-full bg-[#c5a059] flex items-center justify-center font-bold text-black text-sm font-devanagari">
               ने
             </div>
-            <span className="font-extrabold text-md tracking-tight bg-gradient-to-r from-amber-200 to-orange-400 bg-clip-text text-transparent">
-              HeritageArchive
-            </span>
+            <div className="flex flex-col">
+              <span className="font-display font-medium text-lg tracking-tight text-white uppercase">
+                MODERATION <span className="text-[#c5a059]">QUEUE</span>
+              </span>
+              <span className="text-[10px] text-zinc-400 font-devanagari tracking-wider -mt-1">
+                अनुमोदन तथा गुणस्तर नियन्त्रण
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-6 text-xs text-zinc-400 font-medium">
-            <a href="/discover" className="hover:text-amber-400 transition-colors">Discover</a>
-            <a href="/contribute" className="hover:text-amber-400 transition-colors">Contribute</a>
-            <span className="text-white flex items-center gap-1">
-              Moderation Queue
-              <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-            </span>
-          </div>
-
-          <div className="text-xs text-right">
-            {user && (
-              <>
-                <p className="font-bold text-zinc-350">@{user.username}</p>
-                <p className="text-[10px] text-amber-500 font-semibold uppercase tracking-wider">{user.role}</p>
-              </>
-            )}
+          <div className="flex items-center gap-4">
+            <span className="text-xs font-mono text-zinc-400">AUDITOR: @{user?.username} ({user?.role})</span>
+            <button
+              onClick={() => router.push("/discover")}
+              className="px-3.5 py-1.5 border border-white/10 hover:border-[#c5a059] text-xs font-mono text-zinc-300 hover:text-white transition-all rounded-lg"
+            >
+              Exit Queue
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Main Panel grid */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 h-[calc(100vh-4rem)] overflow-hidden">
+      {/* Main Layout */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 z-20 relative">
         
-        {/* Left Side: Pending Queue */}
-        <div className="lg:col-span-4 flex flex-col gap-5 h-full overflow-hidden">
-          <div>
-            <h2 className="text-2xl font-black">Moderation Queue</h2>
-            <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold mt-1">Review pending items</p>
+        {/* Left Column: Pending Queue List */}
+        <div className="lg:col-span-5 flex flex-col gap-4">
+          <div className="bg-[#121216] border border-white/10 rounded-2xl p-5 space-y-2">
+            <span className="text-[11px] font-mono tracking-widest text-[#c5a059] uppercase font-semibold">
+              SUBMISSION AUDIT QUEUE • {queue.length} PENDING
+            </span>
+            <h2 className="text-xl font-normal text-white font-display">Review Submissions</h2>
           </div>
 
-          <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-3 scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent">
+          <div className="space-y-3 overflow-y-auto max-h-[600px] pr-1">
             {loading ? (
-              <div className="flex-1 flex flex-col items-center justify-center gap-2 text-zinc-500 py-12">
-                <span className="w-8 h-8 rounded-full border-2 border-amber-500 border-t-transparent animate-spin" />
-                <span className="text-xs font-semibold uppercase tracking-wider">Syncing queue...</span>
+              <div className="flex items-center justify-center py-12 text-zinc-500 font-mono text-xs">
+                <span className="w-5 h-5 border-2 border-[#c5a059] border-t-transparent rounded-full animate-spin mr-2" />
+                Loading pending queue...
               </div>
             ) : error ? (
-              <div className="p-4 rounded-xl border border-rose-500/15 bg-rose-500/5 text-xs text-rose-400">{error}</div>
+              <div className="p-4 rounded-xl bg-red-950/40 border border-red-500/40 text-xs text-red-300 font-mono">{error}</div>
             ) : queue.length === 0 ? (
-              <div className="text-center py-20 text-zinc-550 border border-dashed border-white/5 rounded-2xl flex flex-col items-center gap-2">
-                <span className="text-lg">🎉</span>
-                <p className="text-xs font-semibold">Queue is clear! No pending submissions.</p>
+              <div className="text-center py-12 text-zinc-500 border border-dashed border-zinc-800 rounded-2xl p-6 font-mono text-xs">
+                ✓ Moderation queue empty. All submissions reviewed!
               </div>
             ) : (
               queue.map((site) => (
                 <div
                   key={site.id}
                   onClick={() => setSelectedSite(site)}
-                  className={`p-4 rounded-2xl border cursor-pointer transition-all ${
+                  className={`p-4 rounded-xl border transition-all cursor-pointer ${
                     selectedSite?.id === site.id
-                      ? "border-amber-500 bg-amber-500/[0.03]"
-                      : "border-white/5 bg-[#0a0a0e] hover:border-white/10"
+                      ? "bg-zinc-900 border-[#c5a059] text-white"
+                      : "bg-[#121216] border-white/10 text-zinc-400 hover:border-white/20"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-[9px] text-amber-500 font-bold uppercase tracking-wider">{site.category}</span>
-                      <h4 className="font-extrabold text-sm text-white">{site.name}</h4>
-                    </div>
-                    <span className="text-[9px] text-zinc-500 font-mono">#{site.id}</span>
+                  <div className="flex items-center justify-between text-xs font-mono mb-1">
+                    <span className="text-[#c5a059] font-bold uppercase">{site.category}</span>
+                    <span>REF-{site.id}</span>
                   </div>
-                  {site.stories && site.stories.length > 0 && (
-                    <p className="text-[11px] text-zinc-400 leading-relaxed line-clamp-2 mt-2">
-                      {site.stories[0].content}
-                    </p>
-                  )}
+                  <h4 className="text-sm font-medium text-white font-display">{site.name}</h4>
+                  <p className="text-[11px] font-mono text-zinc-500 mt-1">
+                    Coords: {site.latitude.toFixed(3)}°, {site.longitude.toFixed(3)}°
+                  </p>
                 </div>
               ))
             )}
           </div>
         </div>
 
-        {/* Right Side: Detail review & action */}
-        <div className="lg:col-span-8 h-full flex flex-col rounded-3xl border border-white/5 bg-[#0a0a0e] overflow-hidden relative shadow-2xl p-6">
+        {/* Right Column: Selected Record Review Detail */}
+        <div className="lg:col-span-7 flex flex-col gap-6">
           {selectedSite ? (
-            <div className="flex-1 flex flex-col gap-6 overflow-hidden">
-              {/* Submission header attributes */}
-              <div className="border-b border-white/5 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="bg-[#121216] border border-white/10 rounded-2xl p-6 md:p-8 space-y-6">
+              <div className="border-b border-white/10 pb-4 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] text-amber-500 font-bold uppercase tracking-wider">{selectedSite.category}</span>
-                  <h3 className="text-2xl font-black text-white mt-0.5">{selectedSite.name}</h3>
-                  <p className="text-[10px] text-zinc-500 mt-1 font-mono">
-                    Coordinates: {selectedSite.latitude.toFixed(5)}°, {selectedSite.longitude.toFixed(5)}° &bull; Submitter ID: #{selectedSite.creator_id}
+                  <span className="text-[11px] font-mono tracking-widest text-[#c5a059] uppercase font-semibold">
+                    RECORD VERIFICATION AUDIT
+                  </span>
+                  <h3 className="text-2xl font-normal text-white font-display mt-0.5">{selectedSite.name}</h3>
+                </div>
+                <span className="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-xs font-bold rounded-lg uppercase">
+                  {selectedSite.status}
+                </span>
+              </div>
+
+              {/* Story Content */}
+              {selectedSite.stories && selectedSite.stories.length > 0 && (
+                <div className="space-y-3 bg-[#09090b] border border-white/10 p-5 rounded-xl">
+                  <div className="flex items-center justify-between text-xs font-mono text-[#c5a059]">
+                    <span>TITLE: {selectedSite.stories[0].title}</span>
+                    <span>LANG: {selectedSite.stories[0].language.toUpperCase()}</span>
+                  </div>
+                  <p className="text-xs text-zinc-300 leading-relaxed font-devanagari">
+                    {selectedSite.stories[0].content}
                   </p>
                 </div>
-                <div className="px-3 py-1 rounded bg-orange-500/10 border border-orange-500/20 text-[10px] font-bold text-orange-400 uppercase tracking-widest self-start">
-                  Awaiting Review
-                </div>
+              )}
+
+              {/* Review Notes Form */}
+              <div className="space-y-3 pt-4 border-t border-white/10">
+                <label className="text-xs font-mono text-zinc-300">Auditor Notes &amp; Verification Rationale</label>
+                <textarea
+                  rows={3}
+                  placeholder="Optional audit notes regarding historical accuracy, coordinates verification, or content safety..."
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  className="w-full bg-[#09090b] border border-white/10 focus:border-[#c5a059] outline-none text-xs text-white p-3 rounded-xl font-body"
+                />
               </div>
 
-              {/* Story scrollable context */}
-              <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-4 scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent">
-                {selectedSite.stories && selectedSite.stories.map((story) => (
-                  <div key={story.id} className="flex flex-col gap-2">
-                    <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-widest">
-                      Story: {story.title} ({story.language.toUpperCase()})
-                    </h4>
-                    <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-wrap bg-white/[0.01] p-4 rounded-xl border border-white/5">
-                      {story.content}
-                    </p>
-                  </div>
-                ))}
+              {actionError && (
+                <div className="p-3 rounded-xl bg-red-950/40 border border-red-500/40 text-xs text-red-300 font-mono">
+                  {actionError}
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <button
+                  onClick={() => handleAction("approved")}
+                  disabled={actionLoading}
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-mono font-semibold text-xs uppercase tracking-wider rounded-xl transition-all"
+                >
+                  ✓ Approve Record
+                </button>
+                <button
+                  onClick={() => handleAction("changes_requested")}
+                  disabled={actionLoading}
+                  className="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white font-mono font-semibold text-xs uppercase tracking-wider rounded-xl transition-all"
+                >
+                  ✎ Request Edits
+                </button>
+                <button
+                  onClick={() => handleAction("rejected")}
+                  disabled={actionLoading}
+                  className="px-5 py-2.5 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white font-mono font-semibold text-xs uppercase tracking-wider rounded-xl transition-all"
+                >
+                  ✕ Reject Record
+                </button>
               </div>
 
-              {/* Actions panel */}
-              <div className="border-t border-white/5 pt-5 flex flex-col gap-4">
-                {actionError && (
-                  <p className="text-xs font-semibold text-rose-400">{actionError}</p>
-                )}
-
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="moderation-notes" className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Moderation Notes / Comments (Optional)</label>
-                  <textarea
-                    id="moderation-notes"
-                    name="notes"
-                    rows={2}
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Provide justification notes (mandatory for changes requested or rejections)..."
-                    className="px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-xs text-white placeholder-zinc-650 focus:outline-none focus:border-amber-500/50 transition-all resize-none"
-                  />
-                </div>
-
-                <div className="flex gap-4">
-                  <button
-                    onClick={() => handleAction("approved")}
-                    disabled={actionLoading}
-                    className="flex-1 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-bold text-black transition-colors shadow-lg shadow-emerald-500/5 flex items-center justify-center gap-1.5"
-                  >
-                    {actionLoading ? "Processing..." : "Approve & Publish"}
-                  </button>
-
-                  <button
-                    onClick={() => handleAction("changes_requested")}
-                    disabled={actionLoading}
-                    className="px-5 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-xs font-semibold text-zinc-300 hover:text-white transition-colors"
-                  >
-                    Request Changes
-                  </button>
-
-                  <button
-                    onClick={() => handleAction("rejected")}
-                    disabled={actionLoading}
-                    className="px-5 py-3 rounded-xl border border-rose-500/20 hover:bg-rose-500/10 text-xs font-semibold text-rose-400 hover:text-rose-300 transition-colors"
-                  >
-                    Reject
-                  </button>
-                </div>
-              </div>
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center gap-2 text-zinc-550 py-20 text-center">
-              <span className="text-3xl">🗳️</span>
-              <p className="text-xs font-semibold">Select a heritage site from the queue to start reviewing.</p>
+            <div className="h-full border border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center p-12 text-zinc-500 font-mono text-xs">
+              Select a pending record from the audit queue to inspect and review.
             </div>
           )}
         </div>
+
       </main>
+
     </div>
   );
 }

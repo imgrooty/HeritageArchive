@@ -263,3 +263,42 @@ async def update_heritage_site(
         
     return site
 
+
+@router.delete("/{id}/media/{media_id}")
+async def delete_heritage_media(
+    id: int,
+    media_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    result = await db.execute(select(HeritageMedia).where(HeritageMedia.id == media_id, HeritageMedia.site_id == id))
+    media = result.scalar_one_or_none()
+    if not media:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Media record not found."
+        )
+        
+    site_res = await db.execute(select(HeritageSite).where(HeritageSite.id == id))
+    site = site_res.scalar_one_or_none()
+
+    if current_user.id != media.contributor_id and (site and current_user.id != site.creator_id) and current_user.role not in ["moderator", "admin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to delete this media attachment."
+        )
+
+    if media.media_url.startswith("/static/uploads/"):
+        file_name = os.path.basename(media.media_url)
+        file_path = os.path.join(UPLOAD_DIR, file_name)
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+            except Exception:
+                pass
+
+    await db.delete(media)
+    await db.commit()
+    return {"status": "success", "message": "Media attachment deleted.", "media_id": media_id}
+
+
