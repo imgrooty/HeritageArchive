@@ -53,6 +53,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+@app.middleware("http")
+async def strip_api_prefix(request, call_next):
+    path = request.scope.get("path", "")
+    if path.startswith("/api/backend"):
+        new_path = path[len("/api/backend"):] or "/"
+        request.scope["path"] = new_path
+    return await call_next(request)
+
 # Enable CORS for the frontend application
 app.add_middleware(
     CORSMiddleware,
