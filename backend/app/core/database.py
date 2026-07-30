@@ -38,13 +38,20 @@ engine = create_async_engine(
     pool_recycle=300,
 )
 
-# Session factory for generating async database sessions
 SessionLocal = async_sessionmaker(
     bind=engine,
     autocommit=False,
     autoflush=False,
     expire_on_commit=False,
 )
+
+def create_sqlite_fallback():
+    global engine, SessionLocal
+    fallback_url = "sqlite+aiosqlite:////tmp/heritage.db"
+    print("Switching active engine to serverless SQLite fallback: /tmp/heritage.db")
+    engine = create_async_engine(fallback_url, future=True, pool_pre_ping=True)
+    SessionLocal = async_sessionmaker(bind=engine, autocommit=False, autoflush=False, expire_on_commit=False)
+    return engine, SessionLocal
 
 # Base class for SQLAlchemy ORM models
 Base = declarative_base()
@@ -54,5 +61,8 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with SessionLocal() as session:
         try:
             yield session
+        except Exception:
+            await session.rollback()
+            raise
         finally:
             await session.close()

@@ -6,7 +6,8 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
 from app.core.config import settings
-from app.core.database import engine, Base
+from app.core.database import engine, Base, create_sqlite_fallback
+
 # Import models to ensure they are registered with Base metadata
 import app.models.user  # noqa
 import app.models.heritage  # noqa
@@ -38,9 +39,16 @@ async def init_db():
                     print(f"Notice: pgvector extension not initialized. Vector search will soft-fallback. Detail: {e}")
         print("Database schema and tables verified/created successfully.")
     except Exception as e:
-        import traceback
-        print(f"Warning: Database initialization check encountered an issue: {type(e).__name__}: {e}")
-        traceback.print_exc()
+        print(f"Warning: Primary database connection issue ({type(e).__name__}: {e}).")
+        if "postgresql" in str(engine.url):
+            print("Notice: IPv6 direct connection or unreachable host detected. Initializing SQLite fallback...")
+            fb_engine, _ = create_sqlite_fallback()
+            try:
+                async with fb_engine.begin() as conn:
+                    await conn.run_sync(Base.metadata.create_all)
+                print("SQLite fallback database initialized successfully.")
+            except Exception as fb_err:
+                print(f"Error initializing SQLite fallback DB: {fb_err}")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
