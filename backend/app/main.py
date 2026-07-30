@@ -76,8 +76,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static folder to host uploaded media assets
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Mount static folder to host uploaded media assets if available
+if os.path.exists("static"):
+    app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Register modular routes
 app.include_router(auth_router)

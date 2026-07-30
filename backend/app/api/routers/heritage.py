@@ -16,8 +16,11 @@ from app.schemas.heritage import HeritageSiteCreate, HeritageSiteResponse, Media
 
 router = APIRouter(prefix="/heritage", tags=["Heritage Sites"])
 
-UPLOAD_DIR = "static/uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+UPLOAD_DIR = "/tmp/uploads" if os.environ.get("VERCEL") else "static/uploads"
+try:
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+except Exception:
+    pass
 
 # Helper function to optionally authenticate user for reading public endpoints
 async def get_current_user_optional(request: Request, db: AsyncSession = Depends(get_db)) -> User | None:
