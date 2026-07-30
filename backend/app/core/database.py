@@ -4,6 +4,7 @@ from sqlalchemy.orm import declarative_base
 from app.core.config import settings
 
 # Initialize asynchronous engine
+# Database engine configuration with asyncpg and SQLite support
 db_url = settings.DATABASE_URL
 
 # Normalize postgres URL scheme for SQLAlchemy asyncpg driver
