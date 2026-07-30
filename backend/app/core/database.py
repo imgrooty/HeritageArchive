@@ -1,11 +1,15 @@
+import os
 from collections.abc import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import declarative_base
 from app.core.config import settings
 
 # Initialize asynchronous engine
-# Database engine configuration with asyncpg and SQLite support
 db_url = settings.DATABASE_URL
+
+# On Vercel serverless environment, if DATABASE_URL points to localhost/127.0.0.1, fallback to /tmp SQLite
+if os.environ.get("VERCEL") and ("localhost" in db_url or "127.0.0.1" in db_url):
+    db_url = "sqlite+aiosqlite:////tmp/heritage.db"
 
 # Normalize postgres URL scheme for SQLAlchemy asyncpg driver
 if db_url.startswith("postgres://"):
