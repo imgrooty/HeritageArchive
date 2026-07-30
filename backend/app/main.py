@@ -59,6 +59,12 @@ async def strip_api_prefix(request, call_next):
     if path.startswith("/api/backend"):
         new_path = path[len("/api/backend"):] or "/"
         request.scope["path"] = new_path
+    elif path in ("/api/index", "/api", "/api/index.py"):
+        path_param = request.query_params.get("path")
+        if path_param:
+            request.scope["path"] = path_param if path_param.startswith("/") else f"/{path_param}"
+        else:
+            request.scope["path"] = "/"
     return await call_next(request)
 
 # Enable CORS for the frontend application
