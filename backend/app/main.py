@@ -25,16 +25,17 @@ async def init_db():
     try:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-            try:
-                await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
-                await conn.execute(text("""
-                    CREATE TABLE IF NOT EXISTS site_embeddings (
-                        site_id INTEGER PRIMARY KEY REFERENCES heritage_sites(id) ON DELETE CASCADE,
-                        embedding vector(384)
-                    );
-                """))
-            except Exception as e:
-                print(f"Notice: pgvector extension not initialized. Vector search will soft-fallback. Detail: {e}")
+            if "postgresql" in str(engine.url):
+                try:
+                    await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
+                    await conn.execute(text("""
+                        CREATE TABLE IF NOT EXISTS site_embeddings (
+                            site_id INTEGER PRIMARY KEY REFERENCES heritage_sites(id) ON DELETE CASCADE,
+                            embedding vector(384)
+                        );
+                    """))
+                except Exception as e:
+                    print(f"Notice: pgvector extension not initialized. Vector search will soft-fallback. Detail: {e}")
         print("Database schema and tables verified/created successfully.")
     except Exception as e:
         print(f"Warning: Database initialization check encountered an issue: {e}")
