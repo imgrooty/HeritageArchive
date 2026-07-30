@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: heritage-archive-api
+    runtime: python
+    repo: https://github.com/imgrooty/HeritageArchive
+    branch: main
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:///./heritage.db
+      - key: FRONTEND_URL
+        value: https://heritage-archive-happyissad8-gmailcoms-projects.vercel.app
