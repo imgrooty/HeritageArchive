@@ -14,8 +14,8 @@ class Settings(BaseSettings):
     )
 
     # Database Configuration
-    DATABASE_URL: str = "sqlite+aiosqlite:///tmp/heritage.db"
-    SYNC_DATABASE_URL: str = "sqlite:///tmp/heritage.db"
+    DATABASE_URL: str = "sqlite+aiosqlite:////tmp/heritage.db"
+    SYNC_DATABASE_URL: str = "sqlite:////tmp/heritage.db"
 
     # Security & Authentication
     SECRET_KEY: str = "default_secret_key_change_in_production_987654321"
